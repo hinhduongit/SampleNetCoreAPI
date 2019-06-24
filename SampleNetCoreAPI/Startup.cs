@@ -1,4 +1,5 @@
-﻿using BusinessAccess.Repository;
+﻿using AutoMapper;
+using BusinessAccess.Repository;
 using DataAccess.ConfigurationManager;
 using DataAccess.DBContext;
 using Microsoft.AspNetCore.Builder;
@@ -36,6 +37,7 @@ namespace SampleNetCoreAPI
 
         public IConfiguration Configuration { get; }
 
+        public IMapper mapper { get; }
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -56,6 +58,8 @@ namespace SampleNetCoreAPI
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
             #endregion
+
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -20,6 +20,7 @@ namespace BusinessAccess.Services.Implement
         public BlogService(IRepository<Blog> blogRepository, IMapper mapper, IConfiguration configuration)
         {
             _blogRepository = blogRepository;
+            _mapper = mapper;
             _logger = LogManager.GetLogger(typeof(BlogService));
             _configuration = configuration;
         }
