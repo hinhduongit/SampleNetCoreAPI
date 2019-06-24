@@ -72,10 +72,5 @@ namespace BusinessAccess.Repository
             if (saveChange)
                 context.SaveChanges();
         }
-
-        IQueryable<T> IRepository<T>.GetAll()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

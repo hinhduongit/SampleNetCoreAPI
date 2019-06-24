@@ -1,15 +1,21 @@
 ﻿using AutoMapper;
 using BusinessAccess.DataContract;
 using BusinessAccess.Repository;
+using BusinessAccess.Services.Implement;
+using BusinessAccess.Services.Interface;
+using Common;
 using DataAccess.ConfigurationManager;
 using DataAccess.DBContext;
 using DataAccess.Model;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Security.Utility;
 using System.IO;
 
 namespace SampleNetCoreAPI
@@ -54,6 +60,37 @@ namespace SampleNetCoreAPI
 
             #endregion
 
+            #region Add Authorization by using JWT
+            services.AddAuthentication(o =>
+            {
+                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.Audience = Configuration["TokenAuthentication:siteUrl"];
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(Constant.SecretSercurityKey)),
+
+                    ValidateIssuer = true,
+                    ValidIssuer = Configuration["TokenAuthentication:siteUrl"],
+
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["TokenAuthentication:siteUrl"],
+
+                    ValidateLifetime = true,
+                };
+            });
+            #endregion
+
+            #region Add Service to dependency injection
+            services.AddTransient<IBlogService, BlogService>();
+            services.AddTransient<IAuthozirationUtility, AuthozirationUtility>();
+            #endregion
+
             #region Add Repository
 
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -76,6 +113,7 @@ namespace SampleNetCoreAPI
             }
 
             app.UseMvc();
+            app.UseAuthentication();
         }
 
         public void ConfigAutoMapper(IServiceCollection services)
