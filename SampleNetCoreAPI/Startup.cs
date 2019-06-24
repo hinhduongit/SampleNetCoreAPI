@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using BusinessAccess.DataContract;
 using BusinessAccess.Repository;
 using DataAccess.ConfigurationManager;
 using DataAccess.DBContext;
+using DataAccess.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -37,15 +39,14 @@ namespace SampleNetCoreAPI
 
         public IConfiguration Configuration { get; }
 
-        public IMapper mapper { get; }
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region Add connection string to EF
             var sqlConnectionString = Configuration.GetConnectionString("MySqlConnection");
             services.AddDbContext<SampleNetCoreAPIContext>
                  (options => options.UseSqlServer(sqlConnectionString));
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            #endregion
 
             #region ADd Configuration to dependency injection
 
@@ -59,7 +60,11 @@ namespace SampleNetCoreAPI
 
             #endregion
 
-            services.AddSingleton(mapper);
+            #region Add AutoMapper
+            ConfigAutoMapper(services);
+            #endregion
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,6 +76,18 @@ namespace SampleNetCoreAPI
             }
 
             app.UseMvc();
+        }
+
+        public void ConfigAutoMapper(IServiceCollection services)
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Blog, BlogContract>();
+
+            });
+
+            IMapper mapper = config.CreateMapper();
+            services.AddSingleton(mapper);
         }
     }
 }
