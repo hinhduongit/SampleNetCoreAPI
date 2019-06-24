@@ -11,9 +11,15 @@ namespace DataAccess.DBContext
 
         public virtual DbSet<Blog> Blogs { get; set; }
         public virtual DbSet<Post> Posts { get; set; }
+        public virtual DbSet<SampleNetCoreConfig> SampleNetCoreConfig { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SampleNetCoreConfig>(entity =>
+            {
+                entity.ToTable("sample_net_core_config");
+            });
+
             modelBuilder.Entity<Blog>(entity =>
             {
                 entity.ToTable("blogs");
